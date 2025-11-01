@@ -1,11 +1,15 @@
+-- ====================================================================
+-- SQL Skript: Erstellung der Datenbank "filmverwaltung"
+-- ====================================================================
+
 DROP DATABASE IF EXISTS filmverwaltung;
 CREATE DATABASE filmverwaltung;
 USE filmverwaltung;
 
 
----------------------------------------------------------------------
------------ 1. Abschnitt: Grundlegendes Datenbankschema -------------
----------------------------------------------------------------------
+-- ====================================================================
+-- 1. Abschnitt: Grundlegendes Datenbankschema
+-- ====================================================================
 
 -- Definiert die Benutzer-Rollen (z.B. Admin, Mitglied)
 CREATE TABLE Rollen (
@@ -99,20 +103,21 @@ CREATE TABLE GeseheneFilme (
     CONSTRAINT chk_bewertung CHECK (persoenlicheBewertung >= 1 AND persoenlicheBewertung <= 10)
 );
 
----------------------------------------------------------------------
------------- 2. Abschnitt: Kernsystem und Berechtigungen ------------
----------------------------------------------------------------------
 
--- Anwendungstabelle für Rollen (Tabelle "Rollen") befüllen
+-- ====================================================================
+-- 2. Abschnitt: Kernsystem und Berechtigungen
+-- ====================================================================
+
+-- --- Anwendungstabelle für Rollen (Tabelle "Rollen") befüllen ---
 INSERT INTO Rollen (rollenName) VALUES ('Administrator'); 
 INSERT INTO Rollen (rollenName) VALUES ('Mitglied');
 INSERT INTO Rollen (rollenName) VALUES ('Gast');
 
--- MariaDB Systemrollen erstellen
+-- --- MariaDB Systemrollen erstellen ---
 CREATE ROLE 'rolle_admin', 'rolle_mitglied', 'rolle_gast';
 
--- Anwendungstabelle für Nutzer (Tabelle "Benutzer") befüllen
-INSERT INTO Benutzer (benutzerName, rollenID)  
+-- --- Anwendungstabelle für Nutzer (Tabelle "Benutzer") befüllen ---
+INSERT INTO Benutzer (benutzerName, rollenID) 
 VALUES ('julian', 1); --Administrator
 INSERT INTO Benutzer (benutzerName, rollenID) 
 VALUES ('lucius', 1); --Administrator
@@ -125,7 +130,7 @@ VALUES ('lena', 2); --Mitglied
 INSERT INTO Benutzer (benutzerName, rollenID)
 VALUES ('sophie', 3); --Gast
 
--- MariaDB Systembenutzer erstellen
+-- --- MariaDB Systembenutzer erstellen ---
 CREATE USER 'julian'@'localhost';
 CREATE USER 'lucius'@'localhost';
 CREATE USER 'atussa'@'localhost';
@@ -134,9 +139,9 @@ CREATE USER 'lena'@'localhost';
 CREATE USER 'sophie'@'localhost';
 
 
----- View: "MeineWatchlist" als persönlicher Filter für die Watchlist Tabelle ----
+-- --- VIEW: "MeineWatchlist" als persönlicher Filter für die Watchlist Tabelle ---
 
--- Der View dient als "Brücke" zwischen dem MariaDB-Systembenutzer (z.B. 'julian@localhost') und unserer Anwendungstabelle 'Benutzer'.
+-- Der View dient als "Brücke" zwischen dem MariaDB-Systembenutzer (z.B. 'julian@localhost') und der Anwendungstabelle 'Benutzer'.
 CREATE VIEW MeineWatchlist AS
 SELECT 
     benutzerID, 
@@ -152,11 +157,11 @@ WHERE
     -- --> Der View zeigt nur Zeilen an, die zur 'benutzerID' des eingeloggten Benutzers passen
     benutzerID = (SELECT benutzerID FROM Benutzer WHERE benutzerName = SUBSTRING_INDEX(CURRENT_USER(), '@', 1))
 
--- WITH CHECK OPTION: Sichert inserts/updates ab. Verhindert, dass 'lucius' (ID 2) einen Eintrag mit der 'benutzerID' von 'julian' (ID 1) erstellen kann.
+-- WITH CHECK OPTION: Sichert inserts/updates ab. Verhindert dass 'lucius' (ID 2) einen Eintrag mit der 'benutzerID' von 'julian' (ID 1) erstellen kann.
 WITH CHECK OPTION;
 
 
----- View: "MeineGesehenenFilme" als persönlicher Filter für die GeseheneFilme Tabelle ----
+-- --- VIEW: "MeineGesehenenFilme" als persönlicher Filter für die GeseheneFilme Tabelle ---
 CREATE VIEW MeineGesehenenFilme AS
 SELECT 
     benutzerID, 
@@ -171,9 +176,9 @@ WHERE
 WITH CHECK OPTION;
 
 
----- Rechte an die MariaDB Systemrollen vergeben ----
+-- --- Rechte an die MariaDB Systemrollen vergeben ---
 
---- Rechte für 'rolle_gast' (Nur Lesezugriff) ---
+-- Rechte für 'rolle_gast' (Nur Lesezugriff) --
 -- Der Gast darf die öffentlichen Sammlungs-Tabellen sehen.
 GRANT SELECT ON filmverwaltung.Filme TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Personen TO 'rolle_gast';
@@ -182,7 +187,7 @@ GRANT SELECT ON filmverwaltung.Genres TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Film_Beteiligungen TO 'rolle_gast';
 -- Der Gast bekommt keinen Zugriff auf 'Watchlist' oder 'GeseheneFilme'
 
---- Rechte für 'rolle_mitglied' (Lesen + Hinzufügen/Bearbeiten) ---
+-- Rechte für 'rolle_mitglied' (Lesen + Hinzufügen/Bearbeiten) --
 -- Ein Mitglied erbt erstmal alle Rechte vom Gast.
 GRANT 'rolle_gast' TO 'rolle_mitglied';
 
@@ -197,12 +202,12 @@ GRANT INSERT, UPDATE ON filmverwaltung.Film_Beteiligungen TO 'rolle_mitglied';
 GRANT SELECT, INSERT, UPDATE, DELETE ON filmverwaltung.MeineWatchlist TO 'rolle_mitglied';
 GRANT SELECT, INSERT, UPDATE, DELETE ON filmverwaltung.MeineGesehenenFilme TO 'rolle_mitglied';
 
---- Rechte für 'rolle_admin' (Vollzugriff) ---
+-- Rechte für 'rolle_admin' (Vollzugriff) --
 -- Ein Admin darf alles, inklusive löschen und die Struktur ändern.
 GRANT ALL PRIVILEGES ON filmverwaltung.* TO 'rolle_admin';
 
 
----- Zuweisung der MariaDB Systemrollen an die Benutzer ----
+-- --- Zuweisung der MariaDB Systemrollen an die Benutzer ---
 GRANT 'rolle_admin' TO 'julian'@'localhost';
 GRANT 'rolle_admin' TO 'lucius'@'localhost';
 GRANT 'rolle_admin' TO 'atussa'@'localhost';
