@@ -114,7 +114,7 @@ INSERT INTO Rollen (rollenName) VALUES ('Mitglied');
 INSERT INTO Rollen (rollenName) VALUES ('Gast');
 
 -- --- MariaDB Systemrollen erstellen ---
-CREATE ROLE 'rolle_admin', 'rolle_mitglied', 'rolle_gast';
+CREATE ROLE IF NOT EXISTS 'rolle_admin', 'rolle_mitglied', 'rolle_gast';
 
 -- --- Anwendungstabelle für Nutzer (Tabelle "Benutzer") befüllen ---
 INSERT INTO Benutzer (benutzerName, rollenID) 
@@ -131,12 +131,20 @@ INSERT INTO Benutzer (benutzerName, rollenID)
 VALUES ('sophie', 3); --Gast
 
 -- --- MariaDB Systembenutzer erstellen ---
-CREATE USER 'julian'@'localhost';
-CREATE USER 'lucius'@'localhost';
-CREATE USER 'atussa'@'localhost';
-CREATE USER 'max'@'localhost';
-CREATE USER 'lena'@'localhost';
-CREATE USER 'sophie'@'localhost';
+CREATE USER IF NOT EXISTS 'julian'@'localhost' IDENTIFIED BY 'password';
+CREATE USER IF NOT EXISTS 'lucius'@'localhost' IDENTIFIED BY 'password';
+CREATE USER IF NOT EXISTS 'atussa'@'localhost' IDENTIFIED BY 'password';
+CREATE USER IF NOT EXISTS 'max'@'localhost' IDENTIFIED BY 'password';
+CREATE USER IF NOT EXISTS 'lena'@'localhost' IDENTIFIED BY 'password';
+CREATE USER IF NOT EXISTS 'sophie'@'localhost' IDENTIFIED BY 'password';
+
+-- Passwörter der MariaDB Systembenutzer setzen (falls User schon existierte)
+ALTER USER 'julian'@'localhost' IDENTIFIED BY 'password';
+ALTER USER 'lucius'@'localhost' IDENTIFIED BY 'password';
+ALTER USER 'atussa'@'localhost' IDENTIFIED BY 'password';
+ALTER USER 'max'@'localhost' IDENTIFIED BY 'password';
+ALTER USER 'lena'@'localhost' IDENTIFIED BY 'password';
+ALTER USER 'sophie'@'localhost' IDENTIFIED BY 'password';
 
 
 -- --- VIEW: "MeineWatchlist" als persönlicher Filter für die Watchlist Tabelle ---
@@ -180,6 +188,7 @@ WITH CHECK OPTION;
 
 -- Rechte für 'rolle_gast' (Nur Lesezugriff) --
 -- Der Gast darf die öffentlichen Sammlungs-Tabellen sehen.
+GRANT USAGE ON filmverwaltung.* TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Filme TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Personen TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Filmreihen TO 'rolle_gast';
@@ -197,6 +206,7 @@ GRANT INSERT, UPDATE ON filmverwaltung.Personen TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Filmreihen TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Genres TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Film_Beteiligungen TO 'rolle_mitglied';
+GRANT SELECT ON filmverwaltung.Benutzer TO 'rolle_mitglied'; -- Mitglieder dürfen Benutzerinformationen einsehen (notwendig für Views)
 
 -- Mitglieder verwalten ihre persönlichen Listen nur über die Views.
 GRANT SELECT, INSERT, UPDATE, DELETE ON filmverwaltung.MeineWatchlist TO 'rolle_mitglied';
@@ -208,9 +218,18 @@ GRANT ALL PRIVILEGES ON filmverwaltung.* TO 'rolle_admin';
 
 
 -- --- Zuweisung der MariaDB Systemrollen an die Benutzer ---
+GRANT 'rolle_gast' TO 'sophie'@'localhost';
+GRANT 'rolle_mitglied' TO 'max'@'localhost';
+GRANT 'rolle_mitglied' TO 'lena'@'localhost';
 GRANT 'rolle_admin' TO 'julian'@'localhost';
 GRANT 'rolle_admin' TO 'lucius'@'localhost';
 GRANT 'rolle_admin' TO 'atussa'@'localhost';
-GRANT 'rolle_mitglied' TO 'max'@'localhost';
-GRANT 'rolle_mitglied' TO 'lena'@'localhost';
-GRANT 'rolle_gast' TO 'sophie'@'localhost';
+
+-- Standardrolle setzen (wird automatisch aktiviert beim Login)
+SET DEFAULT ROLE 'rolle_gast' FOR 'sophie'@'localhost';
+SET DEFAULT ROLE 'rolle_mitglied' FOR 'max'@'localhost';
+SET DEFAULT ROLE 'rolle_mitglied' FOR 'lena'@'localhost';
+SET DEFAULT ROLE 'rolle_admin' FOR 'julian'@'localhost';
+SET DEFAULT ROLE 'rolle_admin' FOR 'lucius'@'localhost';
+SET DEFAULT ROLE 'rolle_admin' FOR 'atussa'@'localhost';
+FLUSH PRIVILEGES;
