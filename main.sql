@@ -163,7 +163,7 @@ WHERE
     -- 2. SUBSTRING_INDEX extrahiert den reinen Namen (z.B. 'julian')
     -- 3. Subquery sucht die 'benutzerID' (z.B. 1) aus unserer 'Benutzer'-Tabelle dazu
     -- --> Der View zeigt nur Zeilen an, die zur 'benutzerID' des eingeloggten Benutzers passen
-    benutzerID = (SELECT benutzerID FROM Benutzer WHERE benutzerName = SUBSTRING_INDEX(CURRENT_USER(), '@', 1))
+    benutzerID = (SELECT benutzerID FROM Benutzer WHERE benutzerName = SUBSTRING_INDEX(USER(), '@', 1))
 
 -- WITH CHECK OPTION: Sichert inserts/updates ab. Verhindert dass 'lucius' (ID 2) einen Eintrag mit der 'benutzerID' von 'julian' (ID 1) erstellen kann.
 WITH CHECK OPTION;
@@ -180,7 +180,7 @@ FROM
     GeseheneFilme
 WHERE
     -- -> Gleiches Prinzip, wie oben: Filtert dynamisch auf die 'benutzerID' des eingeloggten Benutzers.
-    benutzerID = (SELECT benutzerID FROM Benutzer WHERE benutzerName = SUBSTRING_INDEX(CURRENT_USER(), '@', 1))
+    benutzerID = (SELECT benutzerID FROM Benutzer WHERE benutzerName = SUBSTRING_INDEX(USER(), '@', 1))
 WITH CHECK OPTION;
 
 
