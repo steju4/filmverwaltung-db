@@ -159,7 +159,7 @@ FROM
     Watchlist
 WHERE
     -- Dynamischer Filter:
-    -- 1. CURRENT_USER holt den aktuell eingeloggten MariaDB-Benutzer (z.B. 'julian@localhost')
+    -- 1. USER holt den aktuell eingeloggten MariaDB-Benutzer (z.B. 'julian@localhost')
     -- 2. SUBSTRING_INDEX extrahiert den reinen Namen (z.B. 'julian')
     -- 3. Subquery sucht die 'benutzerID' (z.B. 1) aus unserer 'Benutzer'-Tabelle dazu
     -- --> Der View zeigt nur Zeilen an, die zur 'benutzerID' des eingeloggten Benutzers passen
@@ -225,7 +225,7 @@ GRANT 'rolle_admin' TO 'julian'@'localhost';
 GRANT 'rolle_admin' TO 'lucius'@'localhost';
 GRANT 'rolle_admin' TO 'atussa'@'localhost';
 
--- Standardrolle setzen (wird automatisch aktiviert beim Login)
+-- Standardrolle setzen
 SET DEFAULT ROLE 'rolle_gast' FOR 'sophie'@'localhost';
 SET DEFAULT ROLE 'rolle_mitglied' FOR 'max'@'localhost';
 SET DEFAULT ROLE 'rolle_mitglied' FOR 'lena'@'localhost';
