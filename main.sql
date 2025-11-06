@@ -1,5 +1,5 @@
 -- ====================================================================
--- SQL Skript: Erstellung der Datenbank "filmverwaltung"
+-- SQL Skript: Erstellung der Datenbank zur Filmverwaltung
 -- ====================================================================
 
 DROP DATABASE IF EXISTS filmverwaltung;
@@ -149,7 +149,7 @@ ALTER USER 'sophie'@'localhost' IDENTIFIED BY 'password';
 
 -- --- VIEW: "MeineWatchlist" als persönlicher Filter für die Watchlist Tabelle ---
 
--- Der View dient als "Brücke" zwischen dem MariaDB-Systembenutzer (z.B. 'julian@localhost') und der Anwendungstabelle 'Benutzer'.
+-- View dient als Brücke zwischen dem MariaDB-Systembenutzer (z.B. 'julian@localhost') und der Anwendungstabelle 'Benutzer'.
 CREATE VIEW MeineWatchlist AS
 SELECT 
     benutzerID, 
