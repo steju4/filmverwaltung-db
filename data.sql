@@ -115,7 +115,7 @@ INSERT INTO Watchlist (benutzerID, filmID, hinzugefuegtAm) VALUES
 (3, 10, '2025-10-04'), -- Atussa will 'Fight Club' (Film 10) sehen
 (4, 20, '2025-10-05'), -- Max will 'Oppenheimer' (Film 20) sehen
 (4, 1, '2025-10-05'),  -- Max will 'The Dark Knight' (Film 1) sehen
-(5, 7, '2025-10-10'),  -- Lena will 'Pulp Fiction' (Film 7) sehen
+(5, 7, '2025-10-10');  -- Lena will 'Pulp Fiction' (Film 7) sehen
 
 INSERT INTO GeseheneFilme (benutzerID, filmID, gesehenAm, persoenlicheBewertung) VALUES
 (1, 1, '2025-01-15', 9),  -- Julian hat 'The Dark Knight' (Film 1) gesehen & bewertet
@@ -126,4 +126,4 @@ INSERT INTO GeseheneFilme (benutzerID, filmID, gesehenAm, persoenlicheBewertung)
 (4, 10, '2025-05-05', 10), -- Max hat 'Fight Club' (Film 10) gesehen & bewertet
 (4, 7, '2025-06-15', 8),  -- Max hat 'Pulp Fiction' (Film 7) gesehen & bewertet
 (5, 10, '2025-07-01', 9), -- Lena hat 'Fight Club' (Film 10) gesehen & bewertet
-(5, 16, '2025-08-01', 10), -- Lena hat 'The Matrix' (Film 16) gesehen & bewertet
+(5, 16, '2025-08-01', 10); -- Lena hat 'The Matrix' (Film 16) gesehen & bewertet
