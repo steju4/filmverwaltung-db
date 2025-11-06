@@ -39,7 +39,7 @@ CREATE TABLE Genres (
 -- Speichert die Benutzerkonten der Anwendung
 CREATE TABLE Benutzer (
     benutzerID INT PRIMARY KEY AUTO_INCREMENT,
-    benutzerName VARCHAR(100) NOT NULL UNIQUE,
+    benutzerName VARCHAR(100) NOT NULL UNIQUE, --Benutzername muss eindeutig sein für Login
     rollenID INT NOT NULL,
     FOREIGN KEY (rollenID) REFERENCES Rollen(rollenID)
 );
@@ -161,7 +161,7 @@ WHERE
     -- Dynamischer Filter:
     -- 1. USER holt den aktuell eingeloggten MariaDB-Benutzer (z.B. 'julian@localhost')
     -- 2. SUBSTRING_INDEX extrahiert den reinen Namen (z.B. 'julian')
-    -- 3. Subquery sucht die 'benutzerID' (z.B. 1) aus unserer 'Benutzer'-Tabelle dazu
+    -- 3. Subquery sucht die 'benutzerID' (z.B. 1) aus der 'Benutzer'-Tabelle dazu
     -- --> Der View zeigt nur Zeilen an, die zur 'benutzerID' des eingeloggten Benutzers passen
     benutzerID = (SELECT benutzerID FROM Benutzer WHERE benutzerName = SUBSTRING_INDEX(USER(), '@', 1))
 
@@ -187,7 +187,7 @@ WITH CHECK OPTION;
 -- --- Rechte an die MariaDB Systemrollen vergeben ---
 
 -- Rechte für 'rolle_gast' (Nur Lesezugriff) --
--- Der Gast darf die öffentlichen Sammlungs-Tabellen sehen.
+-- Der Gast darf die öffentlichen Sammlungs-Tabellen sehen
 GRANT USAGE ON filmverwaltung.* TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Filme TO 'rolle_gast';
 GRANT SELECT ON filmverwaltung.Personen TO 'rolle_gast';
@@ -217,7 +217,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON filmverwaltung.MeineGesehenenFilme TO 'r
 GRANT ALL PRIVILEGES ON filmverwaltung.* TO 'rolle_admin';
 
 
--- --- Zuweisung der MariaDB Systemrollen an die Benutzer ---
+-- --- Rechte der jeweiligen der MariaDB Systemrollen an die Benutzer zuweisen ---
 GRANT 'rolle_gast' TO 'sophie'@'localhost';
 GRANT 'rolle_mitglied' TO 'max'@'localhost';
 GRANT 'rolle_mitglied' TO 'lena'@'localhost';
