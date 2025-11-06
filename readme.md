@@ -4,7 +4,7 @@ Dieses Repository enthält das `main.sql`-Skript für die Projektarbeit im Modul
 
 ## 📦 Inhalt der `main.sql` Datei
 
-Das Skript ist in zwei Hauptabschnitte unterteilt, die nacheinander ausgeführt werden müssen:
+Das Skript ist in zwei Hauptabschnitte unterteilt:
 
 1.  **Abschnitt 1: Grundlegendes Datenbankschema**
     * Erstellt die Datenbank `filmverwaltung` (nachdem eine eventuell vorhandene Version gelöscht wurde).
