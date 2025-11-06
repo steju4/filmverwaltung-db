@@ -39,7 +39,7 @@ CREATE TABLE Genres (
 -- Speichert die Benutzerkonten der Anwendung
 CREATE TABLE Benutzer (
     benutzerID INT PRIMARY KEY AUTO_INCREMENT,
-    benutzerName VARCHAR(100) NOT NULL UNIQUE, --Benutzername muss eindeutig sein für Login
+    benutzerName VARCHAR(100) NOT NULL UNIQUE, -- Benutzername muss eindeutig sein für Login
     rollenID INT NOT NULL,
     FOREIGN KEY (rollenID) REFERENCES Rollen(rollenID)
 );
@@ -118,17 +118,17 @@ CREATE ROLE IF NOT EXISTS 'rolle_admin', 'rolle_mitglied', 'rolle_gast';
 
 -- --- Anwendungstabelle für Nutzer (Tabelle "Benutzer") befüllen ---
 INSERT INTO Benutzer (benutzerName, rollenID) 
-VALUES ('julian', 1); --Administrator
+VALUES ('julian', 1); -- Administrator
 INSERT INTO Benutzer (benutzerName, rollenID) 
-VALUES ('lucius', 1); --Administrator
+VALUES ('lucius', 1); -- Administrator
 INSERT INTO Benutzer (benutzerName, rollenID)
-VALUES ('atussa', 1); --Administrator
+VALUES ('atussa', 1); -- Administrator
 INSERT INTO Benutzer (benutzerName, rollenID)
-VALUES ('max', 2); --Mitglied
+VALUES ('max', 2); -- Mitglied
 INSERT INTO Benutzer (benutzerName, rollenID)
-VALUES ('lena', 2); --Mitglied
+VALUES ('lena', 2); -- Mitglied
 INSERT INTO Benutzer (benutzerName, rollenID)
-VALUES ('sophie', 3); --Gast
+VALUES ('sophie', 3); -- Gast
 
 -- --- MariaDB Systembenutzer erstellen ---
 CREATE USER IF NOT EXISTS 'julian'@'localhost' IDENTIFIED BY 'password';
