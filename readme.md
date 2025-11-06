@@ -42,7 +42,7 @@ Dieses Skript erstellt die gesamte Struktur und das Sicherheitssystem.
 
 ### 2. Datenbefüllung
 
-Nach der Ausführung von `main.sql` ist die Datenbank strukturell fertig, aber noch **leer** (bis auf die 6 Benutzer und 3 Rollen). Um die Datenbank zu testen, muss ein separates Skript für die Datenbefüllung (Phase 3) ausgeführt werden.
+Nach der Ausführung von `main.sql` ist die Datenbank strukturell fertig, aber noch **leer** (bis auf die 6 Benutzer und 3 Rollen). Um die Datenbank zu nutzen, muss ein separates Skript für die Datenbefüllung (Phase 3) ausgeführt werden.
 
 1.  Führen Sie das Skript `data.sql` ebenfalls als `root` aus (z.B. `mariadb -u root -p < data.sql`).
 
