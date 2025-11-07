@@ -25,26 +25,31 @@ Das Skript ist in zwei Hauptabschnitte unterteilt:
 
 ## 🚀 Installationsanleitung
 
-Die Installation erfolgt in zwei Schritten:
+Die Installation erfolgt in zwei Schritten. **Empfehlenswerter Ablauf:**
 
-### 1. Ausführen des `main.sql` Skripts
+1.  Terminal öffnen und in den Ordner mit `main.sql` und `data.sql` wechseln.
+2.  MariaDB-Shell mit entsprechenden Rechten zu DB anlegen starten (z.B. `mariadb -u root -p`).
+3.  Datenbank anlegen und verwenden:
+    ```sql
+    CREATE DATABASE IF NOT EXISTS filmverwaltung;
+    USE filmverwaltung;
+    ```
+4.  Skripte nacheinander einbinden:
+    ```sql
+    SOURCE main.sql;
+    SOURCE data.sql;
+    ```
 
-Dieses Skript erstellt die gesamte Struktur und das Sicherheitssystem.
+Alternativ lassen sich die Skripte über Umleitung ausführen:
 
-1.  Speichern Sie die `main.sql`-Datei auf Ihrem Rechner.
-2.  Öffnen Sie ein Terminal (Kommandozeile).
-3.  Navigieren Sie in das Verzeichnis, in dem die `main.sql` liegt.
-4.  Führen Sie das Skript mit `root`-Rechten aus (Sie werden nach Ihrem `root`-Passwort gefragt):
-
+1.  Terminal öffnen, in den Ordner mit den Skripten wechseln und anschließend:
     ```bash
     mariadb -u root -p < main.sql
     ```
-
-### 2. Datenbefüllung
-
-Nach der Ausführung von `main.sql` ist die Datenbank strukturell fertig, aber noch **leer** (bis auf die 6 Benutzer und 3 Rollen). Um die Datenbank zu nutzen, muss ein separates Skript für die Datenbefüllung (Phase 3) ausgeführt werden.
-
-1.  Führen Sie das Skript `data.sql` ebenfalls als `root` aus (z.B. `mariadb -u root -p < data.sql`).
+2.  Danach `data.sql` gegen die frisch angelegte Datenbank ausführen:
+    ```bash
+    mariadb -u root -p filmverwaltung < data.sql
+    ```
 
 ## 👨‍💻 Verwendung nach der Erstellung
 
