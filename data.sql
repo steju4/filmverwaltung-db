@@ -2,8 +2,6 @@
 -- 3. Abschnitt: Datenbefüllung (Beispieldaten)
 -- ====================================================================
 
-USE filmverwaltung;
-
 -- 1. Stammdaten (Genres, Filmreihen, Personen)
 
 INSERT INTO Genres (genreName) VALUES
