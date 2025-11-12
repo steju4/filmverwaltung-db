@@ -87,8 +87,99 @@ Das Skript `main.sql` ist in zwei Hauptabschnitte unterteilt, die die gesamte St
 **Frage 1:**
 "Welche Filme (Titel und Erscheinungsjahr) hat der Benutzer 'max' auf seiner persönlichen Watchlist?"
 
+```sql
+-- Frage 1:
+-- Diese Abfrage kann nur als Benutzer mit Admin-Rechten ausgeführt werden!
+
+SELECT
+    F.titel,
+    F.erscheinungsjahr
+FROM
+    Watchlist W
+
+-- Verknüpfe die Watchlist-Einträge mit Filmen
+JOIN
+    Filme F ON W.filmID = F.filmID
+
+-- Verknüpfe Watchlist-Einträge mit den Benutzern
+JOIN
+    Benutzer B ON W.benutzerID = B.benutzerID
+WHERE
+    B.benutzerName = 'max' -- Filtert auf Benutzer
+ORDER BY
+    F.titel;
+```
+
 **Frage 2:**
 "Welche 5 Personen sind in der gesamten Sammlung am häufigsten als Schauspieler vertreten? Zeige den Namen der Person und die Anzahl der Filme, in denen sie mitspielt."
 
+```sql
+-- Frage 2:
+-- Abfrage nutzt Aggregation (COUNT) und Filter (WHERE istSchauspieler).
+
+SELECT
+    -- Kombiniere Vor- und Nachname für Ausgabe
+    CONCAT(P.vorname, ' ', P.name) AS personName,
+    
+    -- Zähle Anzahl der Filmeinträge für die Person
+    COUNT(FB.filmID) AS anzahlFilme
+FROM
+    Personen P
+JOIN
+    Film_Beteiligungen FB ON P.personID = FB.personID
+WHERE
+    -- Stelle sicher, dass die Person auch Schauspieler ist
+    FB.istSchauspieler = TRUE
+GROUP BY
+    P.personID, personName -- Gruppiere die Zählung pro Person
+ORDER BY
+    anzahlFilme DESC -- Sortiere von der höchsten zur niedrigsten Anzahl
+LIMIT 5; -- Zeige nur die Top 5 an
+```
+
 **Frage 3:**
 "Liste für jeden Benutzer (ausgenommen 'Gast') seine Top 3 am besten bewerteten Filme auf. Die Abfrage soll den Benutzernamen, den Filmtitel und die persönliche Bewertung anzeigen."
+
+```sql
+-- Frage 3:
+-- Abfrage nutzt CTE (WITH...) und Window Function (ROW_NUMBER()).
+
+-- 1. CTE definieren 'RankedFilme'
+WITH RankedFilme AS (
+    SELECT
+        B.benutzerName,
+        F.titel,
+        GF.persoenlicheBewertung,
+        
+        -- Window Function: Erstellt eine separate Rangliste (rang) für jeden Benutzer (PARTITION BY)
+        -- sortiert nach der Bewertung von hoch nach niedrig (ORDER BY ... DESC)
+        ROW_NUMBER() OVER(
+            PARTITION BY B.benutzerName
+            ORDER BY GF.persoenlicheBewertung DESC, F.titel ASC
+        ) AS rang
+    FROM
+        GeseheneFilme GF
+    JOIN
+        Benutzer B ON GF.benutzerID = B.benutzerID
+    JOIN
+        Filme F ON GF.filmID = F.filmID
+    JOIN
+        Rollen R ON B.rollenID = R.rollenID
+    WHERE
+        R.rollenName != 'Gast' -- Schließt "Gast"-Benutzer aus
+)
+
+-- 2. Finale Abfrage:
+-- Wähle nur Top 3 (rang <= 3) aus der CTE aus.
+SELECT
+    benutzerName,
+    titel,
+    persoenlicheBewertung,
+    rang
+FROM
+    RankedFilme
+WHERE
+    rang <= 3
+ORDER BY
+    benutzerName, rang;
+```
