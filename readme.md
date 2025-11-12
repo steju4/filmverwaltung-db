@@ -2,22 +2,6 @@
 
 Dieses Repository enthält das `main.sql`-Skript für die Projektarbeit im Modul Datenbanken. Das Skript erstellt eine MariaDB-Datenbank zur Verwaltung einer privaten Filmsammlung, inklusive eines detaillierten Berechtigungskonzepts.
 
-## 📦 Inhalt der `main.sql` Datei
-
-Das Skript ist in zwei Hauptabschnitte unterteilt:
-
-1.  **Abschnitt 1: Grundlegendes Datenbankschema**
-    * Erstellt die Datenbank `filmverwaltung` (nachdem eine eventuell vorhandene Version gelöscht wurde).
-    * Erstellt alle 9 Kerntabellen (`Filme`, `Personen`, `Benutzer`, `Rollen`, `Watchlist` etc.) mit den notwendigen Primärschlüsseln, Fremdschlüsseln, `UNIQUE`-Constraints und `CHECK`-Constraints.
-
-2.  **Abschnitt 2: Kernsystem und Berechtigungen**
-    * Befüllt die Anwendungstabellen `Rollen` und `Benutzer` mit den Stammdaten für die Logik.
-    * Erstellt die MariaDB-Systemrollen (`rolle_admin`, `rolle_mitglied`, `rolle_gast`).
-    * Erstellt die MariaDB-Systembenutzer (z.B. 'julian', 'max', 'sophie') mit Passwörtern.
-    * Erstellt die beiden Sicherheits-`VIEW`s (`MeineWatchlist`, `MeineGesehenenFilme`), die als "Brücke" zwischen den Systembenutzern und der Anwendungslogik dienen.
-    * Vergibt detaillierte `GRANT`-Berechtigungen an die Rollen.
-    * Weist den Benutzern ihre jeweiligen Rollen zu und setzt diese als `DEFAULT ROLE`, damit sie beim Login automatisch aktiv sind.
-
 ## ⚙️ Voraussetzungen
 
 * Eine laufende MariaDB-Datenbankinstanz.
