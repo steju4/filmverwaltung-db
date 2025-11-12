@@ -78,7 +78,7 @@ Das Skript `main.sql` ist in zwei Hauptabschnitte unterteilt, die die gesamte St
     * Vergibt detaillierte `GRANT`-Berechtigungen an die Rollen.
     * Weist den Benutzern ihre jeweiligen Rollen zu und setzt diese als `DEFAULT ROLE`, damit sie beim Login automatisch aktiv sind.
 
-    Eine separate `data.sql`-Datei wird verwendet, um die Datenbank mit Beispieldaten wie Filmen, Personen etc. zu befüllen.)*
+    Eine separate `data.sql`-Datei wird verwendet, um die Datenbank mit Beispieldaten wie Filmen, Personen etc. zu befüllen.
 
 ---
 
