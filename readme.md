@@ -4,7 +4,7 @@ Dieses Repository enthält das `main.sql`-Skript für die Projektarbeit im Modul
 
 ## ⚙️ Voraussetzungen
 
-* Eine laufende MariaDB-Datenbankinstanz.
+* Eine laufende MariaDB-Datenbankinstanz (Version 10.6 oder neuer wird für volle Kompatibilität dringend empfohlen).
 * Zugriff auf einen Admin-Benutzer (z.B. `root`), der die Berechtigung hat, Datenbanken zu löschen (`DROP DATABASE`) und Benutzer/Rollen zu erstellen (`CREATE USER`, `CREATE ROLE`).
 
 ## 🚀 Installationsanleitung
