@@ -175,7 +175,6 @@ SELECT
     benutzerName,
     titel,
     persoenlicheBewertung,
-    rang
 FROM
     RankedFilme
 WHERE
