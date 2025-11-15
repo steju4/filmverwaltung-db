@@ -51,7 +51,27 @@ INSERT INTO Personen (vorname, name) VALUES
 ('Martin', 'Scorsese'),     -- ID 28
 ('Robert', 'De Niro'),      -- ID 29
 ('Al', 'Pacino'),           -- ID 30
-('Bong', 'Joon-ho');        -- ID 31
+('Bong', 'Joon-ho'),        -- ID 31
+('Jake', 'Gyllenhaal'),     -- ID 32
+('Robert', 'Downey Jr.'),   -- ID 33
+('Mark', 'Ruffalo'),        -- ID 34
+('Leonardo', 'DiCaprio'),   -- ID 35
+('Jack', 'Nicholson'),      -- ID 36
+('Ridley', 'Scott'),        -- ID 37
+('Russell', 'Crowe'),       -- ID 38
+('George', 'Miller'),       -- ID 39
+('Tom', 'Hardy'),           -- ID 40
+('Charlize', 'Theron'),     -- ID 41
+('Hugh', 'Jackman'),        -- ID 42
+('Scarlett', 'Johansson'),  -- ID 43
+('Joel', 'Coen'),           -- ID 44
+('Ethan', 'Coen'),          -- ID 45
+('Javier', 'Bardem'),       -- ID 46
+('Damien', 'Chazelle'),     -- ID 47
+('Miles', 'Teller'),        -- ID 48
+('J.K.', 'Simmons'),        -- ID 49
+('Christoph', 'Waltz'),     -- ID 50
+('Francis Ford', 'Coppola');-- ID 51
 
 
 -- 2. Filme (abhängig von Genres & Filmreihen)
@@ -83,7 +103,18 @@ INSERT INTO Filme (titel, erscheinungsjahr, medium, genreID, filmreiheID) VALUES
 ('Parasite', 2019, 'Blu-ray', 5, NULL),              -- Film ID 24
 ('Goodfellas', 1990, 'Netflix', 4, NULL),            -- Film ID 25 
 ('The Godfather', 1972, '4K Blu-ray', 4, NULL),      -- Film ID 26
-('Interstellar', 2014, 'Amazon Prime', 2, NULL);     -- Film ID 27 
+('Interstellar', 2014, 'Amazon Prime', 2, NULL),     -- Film ID 27
+('Zodiac', 2007, 'Amazon Prime', 5, NULL),                 -- Film ID 28
+('The Departed', 2006, 'Blu-ray', 4, NULL),                -- Film ID 29
+('Gladiator', 2000, 'DVD', 3, NULL),                       -- Film ID 30
+('Mad Max: Fury Road', 2015, '4K Blu-ray', 1, NULL),       -- Film ID 31
+('The Prestige', 2006, 'Blu-ray', 5, NULL),                -- Film ID 32
+('No Country for Old Men', 2007, 'Blu-ray', 4, NULL),      -- Film ID 33
+('Whiplash', 2014, 'Amazon Prime', 3, NULL),               -- Film ID 34
+('Inglourious Basterds', 2009, 'Blu-ray', 9, NULL),        -- Film ID 35
+('The Godfather Part II', 1974, '4K Blu-ray', 4, NULL),    -- Film ID 36
+('Shutter Island', 2010, 'Netflix', 5, NULL);              -- Film ID 37
+
 
 
 -- 3. Verknüpfungen (Film_Beteiligungen) sortiert nach filmID
@@ -102,7 +133,16 @@ INSERT INTO Film_Beteiligungen (filmID, personID, istRegisseur, istSchauspieler)
 (21, 25, TRUE, FALSE),(21, 26, FALSE, TRUE),(21, 27, FALSE, TRUE),
 (23, 28, TRUE, FALSE),(23, 29, FALSE, TRUE),(23, 30, FALSE, TRUE),
 (24, 31, TRUE, FALSE),
-(27, 1, TRUE, FALSE);
+(27, 1, TRUE, FALSE), (28, 14, TRUE, FALSE), (28, 32, FALSE, TRUE), (28, 33, FALSE, TRUE), (28, 34, FALSE, TRUE),
+(29, 28, TRUE, FALSE), (29, 35, FALSE, TRUE), (29, 27, FALSE, TRUE), (29, 36, FALSE, TRUE),
+(30, 37, TRUE, FALSE), (30, 38, FALSE, TRUE),
+(31, 39, TRUE, FALSE), (31, 40, FALSE, TRUE), (31, 41, FALSE, TRUE),
+(32, 1, TRUE, FALSE),  (32, 2, FALSE, TRUE),  (32, 42, FALSE, TRUE), (32, 43, FALSE, TRUE),
+(33, 44, TRUE, FALSE), (33, 45, TRUE, FALSE), (33, 46, FALSE, TRUE),
+(34, 47, TRUE, FALSE), (34, 48, FALSE, TRUE), (34, 49, FALSE, TRUE),
+(35, 7, TRUE, FALSE),  (35, 15, FALSE, TRUE), (35, 50, FALSE, TRUE),
+(36, 51, TRUE, FALSE), (36, 30, FALSE, TRUE), (36, 29, FALSE, TRUE),
+(37, 28, TRUE, FALSE), (37, 35, FALSE, TRUE), (37, 34, FALSE, TRUE);
 
 
 -- 4. Persönliche Listen (Watchlist & GeseheneFilme)
@@ -111,19 +151,45 @@ INSERT INTO Film_Beteiligungen (filmID, personID, istRegisseur, istSchauspieler)
 INSERT INTO Watchlist (benutzerID, filmID, hinzugefuegtAm) VALUES
 (1, 14, '2025-10-01'), -- Julian will 'Dune' (Film 14) sehen
 (1, 15, '2025-10-02'), -- Julian will 'Blade Runner 2049' (Film 15) sehen
+(1, 27, '2025-10-02'), -- Julian will 'Interstellar' (Film 27) sehen
+(1, 31, '2025-10-12'), -- Julian will 'Mad Max: Fury Road' (Film 31) sehen
+(1, 32, '2025-10-13'), -- Julian will 'The Prestige' (Film 32) sehen
 (2, 4, '2025-10-03'),  -- Lucius will 'LOTR 1' (Film 4) sehen
+(2, 5,  '2025-10-06'), -- Lucius will 'LOTR 2' (Film 5) sehen
+(2, 6,  '2025-10-07'), -- Lucius will 'LOTR 3' (Film 6) sehen
+(2, 27, '2025-10-08'), -- Lucius will 'Interstellar' (Film 27) sehen
+(2, 35, '2025-10-09'), -- Lucius will 'Inglourious Basterds' (Film 35) sehen
 (3, 10, '2025-10-04'), -- Atussa will 'Fight Club' (Film 10) sehen
+(3, 22, '2025-10-12'), -- Atussa will 'Forrest Gump' (Film 22) sehen
+(3, 28, '2025-10-13'), -- Atussa will 'Zodiac' (Film 28) sehen
+(3, 34, '2025-10-14'), -- Atussa will 'Whiplash' (Film 34) sehen
 (4, 20, '2025-10-05'), -- Max will 'Oppenheimer' (Film 20) sehen
 (4, 1, '2025-10-05'),  -- Max will 'The Dark Knight' (Film 1) sehen
-(5, 7, '2025-10-10');  -- Lena will 'Pulp Fiction' (Film 7) sehen
+(5, 7, '2025-10-10'),  -- Lena will 'Pulp Fiction' (Film 7) sehen
+(5, 35, '2025-10-13'), -- Lena will 'Inglourious Basterds' (Film 35) sehen
+(5, 30, '2025-10-14'); -- Lena will 'Gladiator' (Film 30) sehen
 
 INSERT INTO GeseheneFilme (benutzerID, filmID, gesehenAm, persoenlicheBewertung) VALUES
 (1, 1, '2025-01-15', 9),  -- Julian hat 'The Dark Knight' (Film 1) gesehen & bewertet
 (1, 9, '2025-02-20', 10), -- Julian hat 'Shawshank Redemption' (Film 9) gesehen & bewertet
 (1, 19, '2025-03-10', 8), -- Julian hat 'Inception' (Film 19) gesehen & bewertet
+(1, 25, '2025-04-05', 9),  -- Julian hat 'Goodfellas' (Film 25) gesehen & bewertet
+(1, 26, '2025-04-25', 8),  -- Julian hat 'The Godfather' (Film 26) gesehen & bewertet
 (2, 21, '2025-01-01', 9), -- Lucius hat 'Saving Private Ryan' (Film 21) gesehen & bewertet
+(2, 4,  '2025-02-10', 9),  -- Lucius hat 'LOTR Fellowship' (Film 4) gesehen & bewertet
+(2, 5,  '2025-02-20', 8),  -- Lucius hat 'LOTR Two Towers' (Film 5) gesehen & bewertet
+(2, 6,  '2025-03-05', 10), -- Lucius hat 'LOTR Return of the King' (Film 6) gesehen & bewertet
+(2, 27, '2025-03-25', 9),  -- Lucius hat 'Interstellar' (Film 27) gesehen & bewertet
 (3, 12, '2025-04-12', 8), -- Atussa hat 'Gran Torino' (Film 12) gesehen & bewertet
+(3, 24, '2025-02-18', 9),  -- Atussa hat 'Parasite' (Film 24) gesehen & bewertet
+(3, 34, '2025-03-12', 10), -- Atussa hat 'Whiplash' (Film 34) gesehen & bewertet
+(3, 22, '2025-04-01', 8),  -- Atussa hat 'Forrest Gump' (Film 22) gesehen & bewertet
 (4, 10, '2025-05-05', 10), -- Max hat 'Fight Club' (Film 10) gesehen & bewertet
 (4, 7, '2025-06-15', 8),  -- Max hat 'Pulp Fiction' (Film 7) gesehen & bewertet
+(4, 20, '2025-07-20', 9),  -- Max hat 'Oppenheimer' (Film 20) gesehen & bewertet
+(4, 21, '2025-08-05', 8),  -- Max hat 'Saving Private Ryan' (Film 21) gesehen & bewertet
+(4, 28, '2025-08-25', 7),  -- Max hat 'Zodiac' (Film 28) gesehen & bewertet
 (5, 10, '2025-07-01', 9), -- Lena hat 'Fight Club' (Film 10) gesehen & bewertet
-(5, 16, '2025-08-01', 10); -- Lena hat 'The Matrix' (Film 16) gesehen & bewertet
+(5, 16, '2025-08-01', 10), -- Lena hat 'The Matrix' (Film 16) gesehen & bewertet
+(5, 32, '2025-08-15', 9),  -- Lena hat 'The Prestige' (Film 32) gesehen & bewertet
+(5, 19, '2025-09-05', 10); -- Lena hat 'Inception' (Film 19) gesehen & bewertet
