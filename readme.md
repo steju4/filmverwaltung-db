@@ -11,17 +11,16 @@ Dieses Repository enthält das `main.sql`-Skript für die Projektarbeit im Modul
 
 Die Installation erfolgt in zwei Schritten. **Empfehlenswerter Ablauf:**
 
-1.  Terminal öffnen und in den Ordner mit `main.sql` und `data.sql` wechseln.
+1.  Terminal öffnen und in den Ordner mit `main.sql` wechseln.
 2.  MariaDB-Shell mit entsprechenden Rechten zu DB anlegen starten (z.B. `mariadb -u root -p`).
 3.  Datenbank anlegen und verwenden:
     ```sql
     CREATE DATABASE IF NOT EXISTS filmverwaltung;
     USE filmverwaltung;
     ```
-4.  Skripte nacheinander einbinden:
+4.  Skript ausführen:
     ```sql
     SOURCE main.sql;
-    SOURCE data.sql;
     ```
 
 Alternativ lassen sich die Skripte über Umleitung ausführen:
@@ -29,10 +28,6 @@ Alternativ lassen sich die Skripte über Umleitung ausführen:
 1.  Terminal öffnen, in den Ordner mit den Skripten wechseln und anschließend:
     ```bash
     mariadb -u root -p < main.sql
-    ```
-2.  Danach `data.sql` gegen die frisch angelegte Datenbank ausführen:
-    ```bash
-    mariadb -u root -p filmverwaltung < data.sql
     ```
 
 ## 👨‍💻 Verwendung nach der Erstellung

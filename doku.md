@@ -64,7 +64,7 @@ Als Ausgangsproblem besitzt ein filminteressierter Haushalt eine über Jahre gew
 
 ### 📦 Inhalt der `main.sql` Datei
 
-Das Skript `main.sql` ist in zwei Hauptabschnitte unterteilt, die die gesamte Struktur und Sicherheit der Datenbank definieren:
+Das Skript `main.sql` ist in drei Hauptabschnitte unterteilt, die die gesamte Struktur und Sicherheit der Datenbank definieren:
 
 1.  **Abschnitt 1: Grundlegendes Datenbankschema**
     * Erstellt die Datenbank `filmverwaltung` (nachdem eine eventuell vorhandene Version gelöscht wurde).
@@ -78,7 +78,12 @@ Das Skript `main.sql` ist in zwei Hauptabschnitte unterteilt, die die gesamte St
     * Vergibt detaillierte `GRANT`-Berechtigungen an die Rollen.
     * Weist den Benutzern ihre jeweiligen Rollen zu und setzt diese als `DEFAULT ROLE`, damit sie beim Login automatisch aktiv sind.
 
-    Eine separate `data.sql`-Datei wird verwendet, um die Datenbank mit Beispieldaten wie Filmen, Personen etc. zu befüllen.
+3.  **Abschnitt 3: Datenbefüllung**
+    * Befüllt die Tabellen `Genres` und `Filmreihen` mit den grundlegenden Kategorien
+    * Fügt Beispieldaten für `Personen` (Regisseure und Schauspieler) hinzu, die in den Filmen vorkommen.
+    * Befüllt die Tabelle `Filme` mit einer umfangreichen Sammlung von Beispielfilmen, inklusive Metadaten.
+    * Verknüpft Filme mit Personen über die Tabelle `Film_Beteiligungen` und legt dabei fest, ob die Person als Regisseur und/oder Schauspieler beteiligt war.
+    * Befüllt die personalisierten Listen (`Watchlist`, `GeseheneFilme`) mit Beispieldaten für jeden Benutzer, sodass jeder Nutzer 3–5 Filme auf seiner Watchlist und seiner Liste gesehener Filme hat. Dies ermöglicht das direkte Testen der personalisierten Funktionen und Abfragen.
 
 ---
 
