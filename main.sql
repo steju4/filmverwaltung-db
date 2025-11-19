@@ -1,5 +1,5 @@
 -- ====================================================================
--- SQL Skript: Erstellung der Datenbank zur Filmverwaltung
+-- SQL Skript: Erstellung der Datenbank "filmverwaltung"
 -- ====================================================================
 
 DROP DATABASE IF EXISTS filmverwaltung;
@@ -35,6 +35,17 @@ CREATE TABLE Genres (
     genreID INT PRIMARY KEY AUTO_INCREMENT,
     genreName VARCHAR(50) NOT NULL UNIQUE
 );
+INSERT INTO Genres (genreName) VALUES
+('Action'),
+('Komödie'),
+('Drama'),
+('Sci-Fi'),
+('Fantasy'),
+('Horror'),
+('Thriller'),
+('Romantik'),
+('Animation'),
+('Dokumentation');
 
 -- Speichert die Benutzerkonten der Anwendung
 CREATE TABLE Benutzer (
@@ -149,7 +160,7 @@ ALTER USER 'sophie'@'localhost' IDENTIFIED BY 'password';
 
 -- --- VIEW: "MeineWatchlist" als persönlicher Filter für die Watchlist Tabelle ---
 
--- View dient als Brücke zwischen dem MariaDB-Systembenutzer (z.B. 'julian@localhost') und der Anwendungstabelle 'Benutzer'.
+-- Der View dient als "Brücke" zwischen dem MariaDB-Systembenutzer (z.B. 'julian@localhost') und der Anwendungstabelle 'Benutzer'.
 CREATE VIEW MeineWatchlist AS
 SELECT 
     benutzerID, 
@@ -204,7 +215,6 @@ GRANT 'rolle_gast' TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Filme TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Personen TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Filmreihen TO 'rolle_mitglied';
-GRANT INSERT, UPDATE ON filmverwaltung.Genres TO 'rolle_mitglied';
 GRANT INSERT, UPDATE ON filmverwaltung.Film_Beteiligungen TO 'rolle_mitglied';
 GRANT SELECT ON filmverwaltung.Benutzer TO 'rolle_mitglied'; -- Mitglieder dürfen Benutzerinformationen einsehen (notwendig für Views)
 
