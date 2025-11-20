@@ -2,12 +2,12 @@
 
 Dieses Repository enthält das `main.sql`-Skript für die Projektarbeit im Modul Datenbanken. Das Skript erstellt eine MariaDB-Datenbank zur Verwaltung einer privaten Filmsammlung, inklusive eines detaillierten Berechtigungskonzepts.
 
-## ⚙️ Voraussetzungen
+## Voraussetzungen
 
 * Eine laufende MariaDB-Datenbankinstanz (Version 10.6 oder neuer wird für volle Kompatibilität dringend empfohlen).
 * Zugriff auf einen Admin-Benutzer (z.B. `root`), der die Berechtigung hat, Datenbanken zu löschen (`DROP DATABASE`) und Benutzer/Rollen zu erstellen (`CREATE USER`, `CREATE ROLE`).
 
-## 🚀 Installationsanleitung
+## Installationsanleitung
 
 Die Installation erfolgt in zwei Schritten. **Empfehlenswerter Ablauf:**
 
@@ -30,7 +30,7 @@ Alternativ lassen sich die Skripte über Umleitung ausführen:
     mariadb -u root -p < main.sql
     ```
 
-## 👨‍💻 Verwendung nach der Erstellung
+## Verwendung nach der Erstellung
 
 Nachdem die Skripte ausgeführt wurde, kann die Datenbank getestet werden, indem man sich als einer der definierten Benutzer anmeldet.
 

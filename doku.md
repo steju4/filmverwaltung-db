@@ -15,14 +15,12 @@ Als Ausgangsproblem besitzt ein filminteressierter Haushalt eine über Jahre gew
 * **Leistungsfähige Such- und Filterfunktionen:** Die Sammlung kann gezielt nach einer Vielzahl von Kriterien durchsucht werden, darunter Genre, Erscheinungsjahr oder Regisseur. Zusätzlich kann jeder Nutzer nach seiner eigenen, persönlichen Bewertung filtern.
 * **Verwaltung einer "Watchlist":** Jeder Nutzer kann eine eigene, persönliche Wunschliste führen, um Filmempfehlungen oder Kaufwünsche systematisch zu erfassen.
 * **Verwaltung bereits gesehener Filme:** Jeder Nutzer kann für sich markieren, welche Filme er bereits gesehen hat. Dabei können individuelle Informationen wie das Datum des Sehens und eine persönliche Bewertung hinterlegt werden.
-* **Potenzial für Statistiken:** Die erfassten Daten bilden die Grundlage für interessante Auswertungen. Dies umfasst sowohl Statistiken über die gesamte Sammlung (z. B. "Welches Genre ist am stärksten vertreten?") als auch benutzerspezifische Auswertungen.
 
 ### Einschränkungen/Abgrenzung
 
-* **Kein Streaming-Dienst oder Medien-Player:** Die Datenbank dient ausschließlich der Verwaltung von Metadaten. Sie beinhaltet nicht die eigentlichen Filmdateien und bietet keine integrierte Funktion zum Abspielen der Medien.
+* **Kein Streaming-Dienst oder Medien-Player:** Die Datenbank dient ausschließlich der Verwaltung von Metadaten. Sie beinhaltet nicht die eigentlichen Filmdateien und bietet keine integrierte Funktion zum Abspielen der Medien. Es werden keine kommerziellen Aspekte (Shopsystem, Lizenzverwaltung etc.) abgebildet.
 * **Fokus auf private Nutzung im kleinen Kreis:** Die Benutzer- und Rollenverwaltung ist für einen privaten, überschaubaren Personenkreis ausgelegt und nicht auf Skalierbarkeit für tausende Nutzer ausgelegt.
 * **Manuelle Dateneinpflege:** Es wird keine Schnittstelle zu externen, öffentlichen Filmdatenbanken implementiert. Alle Filminformationen müssen manuell eingegeben werden.
-* **Keine kommerziellen Funktionen:** Das System ist eine reine Verwaltungsanwendung. Es werden keine kommerziellen Aspekte (Shopsystem, Lizenzverwaltung etc.) abgebildet.
 * **Kein Verleih- oder Bestandsmanagement:** Die Datenbank erfasst, welche Filme vorhanden sind, beinhaltet aber keine Funktion zur Verwaltung eines Verleihs an andere Personen.
 
 ---
@@ -55,14 +53,66 @@ Als Ausgangsproblem besitzt ein filminteressierter Haushalt eine über Jahre gew
 ### Nicht-funktionale Anforderungen
 
 * **Datenkonsistenz und -integrität:** Die Datenbank sichert durch `PRIMARY KEY`, `FOREIGN KEY` und `CHECK`-Constraints (z.B. `chk_bewertung`) die Stimmigkeit der Daten.
-* **Bedienbarkeit und Zuverlässigkeit:** Die Datenbank ist durch die bereitgestellten SQL-Skripte (`main.sql`, `data.sql`) und die `README.md` auf einem anderen System lauffähig und reproduzierbar.
+* **Bedienbarkeit und Zuverlässigkeit:** Die Datenbank ist durch das bereitgestellte SQL-Skript (`main.sql`) und die `README.md` auf einem anderen System lauffähig und reproduzierbar.
 * **Sicherheit:** Der Zugriff ist über ein Berechtigungskonzept geregelt. Die Zuweisung von Rechten (`GRANT`) erfolgt auf Basis von Rollen (`rolle_admin`, `rolle_mitglied`, `rolle_gast`).
 
 ---
 
-## 3. Technische Umsetzung
+## 3. Begründungen des Entwurfs
 
-### 📦 Inhalt der `main.sql` Datei
+Der Entwurf der Datenbank basiert auf zwei Ebenen: Dem strukturellen Aufbau (ERM) und der technischen Implementierung der Sicherheitslogik.
+
+#### 1. Begründungen zum ERM-Modell (Struktur)
+
+Diese Entscheidungen betreffen direkt den Aufbau der Tabellen und Beziehungen, wie sie im ERM-Diagramm dargestellt sind.
+
+* **Generalisierung der Entität "Personen":**
+    Schauspieler und Regisseure werden nicht als getrennte Entitäten modelliert, sondern in einer generalisierten Entität `Personen` zusammengefasst.
+    * *Grund:* In der Filmindustrie übernehmen Personen oft beide Rollen (z. B. Clint Eastwood). Getrennte Entitäten würden zu Redundanzen führen. Eine zentrale Tabelle vereinfacht die Pflege der Stammdaten massiv.
+
+* **Modellierung der Film-Beteiligungen (n:m mit Attributen):**
+    Die Beziehung zwischen `Filme` und `Personen` ist als eine einzige n:m-Beziehung modelliert. Anstatt zwei separate Beziehungen (`führt_regie`, `spielt_mit`) zu zeichnen, nutzen wir Attribute (`istRegisseur`, `istSchauspieler`) direkt an der Beziehungsraute.
+    * *Grund:* Dies reduziert die Komplexität des Diagramms. Eine Person kann in einem einzigen Datensatz präzise einem Film zugeordnet werden, auch wenn sie mehrere Funktionen gleichzeitig ausübt.
+
+* **Personalisierte Listen als Beziehungstabellen:**
+    Die Funktionen "Watchlist" und "Gesehene Filme" sind als n:m-Beziehungen zwischen `Benutzer` und `Filme` realisiert.
+    * *Grund:* Diese Daten gehören logisch weder allein zum Nutzer noch zum Film. Besonders bei `GeseheneFilme` sind Attribute wie `persoenlicheBewertung` und `gesehenAm` zwingend Eigenschaften der *Beziehung* selbst, was im ERM durch Attribute an der Raute dargestellt wird.
+
+* **Explizite Entität "Benutzer":**
+    Das ERM beinhaltet eine eigene Entität `Benutzer`, obwohl die Datenbank (MariaDB) technisch eigene User verwaltet.
+    * *Grund:* Um fachliche Beziehungen (wie "Nutzer X hat Film Y auf der Watchlist") im ERM modellieren zu können, benötigen wir eine referenzierbare ID (`benutzerID`). System-User haben keine solche ID, daher ist diese Entität im Datenmodell zwingend erforderlich.
+
+* **Auslagerung der Rollen in eine eigene Entität:**
+  Die Benutzerrollen (`Administrator`, `Mitglied`, `Gast`) werden nicht als einfaches Textfeld in der Tabelle `Benutzer` gespeichert, sondern in einer eigenständigen Tabelle `Rollen` verwaltet und über einen Fremdschlüssel referenziert.
+  * *Grund:* Dies gewährleistet die Datenintegrität und Normalisierung. Es verhindert inkonsistente Schreibweisen (z.B. "Admin" vs. "Administrator") und stellt sicher, dass Benutzern nur gültige, vordefinierte Rollenbezeichnungen zugewiesen werden können.
+
+* **Normalisierung (Genres und Filmreihen):**
+    Attribute wie `Genre` und `Filmreihe` wurden in eigenständige Entitäten ausgelagert (3. Normalform).
+    * *Grund:* Vermeidung von Redundanz und Inkonsistenz (z. B. Schreibfehler). Änderungen an einer Bezeichnung wirken sich so sofort global auf alle verknüpften Filme aus.
+
+#### 2. Begründungen zur technischen Umsetzung (Logik & Sicherheit)
+
+Diese Entscheidungen betreffen die Art und Weise, wie das Datenmodell mittels SQL technisch abgesichert und genutzt wird.
+
+* **Sicherheitskonzept durch personalisierte VIEWs:**
+    Mitglieder greifen niemals direkt auf die Tabellen `Watchlist` oder `GeseheneFilme` zu, sondern ausschließlich über die VIEWs `MeineWatchlist` und `MeineGesehenenFilme`.
+    * *Grund:* Dies implementiert eine "Row-Level Security". Durch den Filter `WHERE benutzerID = ... USER()` und die `WITH CHECK OPTION` wird technisch erzwungen, dass Benutzer nur ihre eigenen Datensätze sehen und bearbeiten können. Ein Manipulieren fremder Daten ist auf Datenbankebene unmöglich.
+
+* **Logische Kopplung von System- und Anwendungsbenutzern:**
+    Das System nutzt eine "doppelte Buchführung" für Benutzer: Der technische Zugang erfolgt über MariaDB-User (für Passwort & Rechte), die fachliche Logik über die Tabelle `Benutzer`.
+    * *Grund:* Diese Trennung entkoppelt die Sicherheit (DBMS) von den Daten (Anwendung). Die dynamische Verknüpfung über den Benutzernamen im VIEW erlaubt es uns, die Vorteile beider Welten zu nutzen: Die strikte Rechteverwaltung von SQL und die relationale Datenhaltung für Nutzerprofile.
+
+#### 3. Begründung des Rollenkonzepts
+
+Das Berechtigungskonzept wurde entwickelt, um die Datenintegrität zu schützen und gleichzeitig eine flexible Nutzung im privaten Umfeld zu ermöglichen.
+
+* **Administrator:** Diese Rolle ist notwendig, um die Stammdatenpflege (Löschen, Strukturänderungen) auf eine vertrauenswürdige Person zu beschränken. Dies verhindert, dass wichtige Daten versehentlich durch andere Haushaltsmitglieder gelöscht werden.
+* **Mitglied:** Die Unterscheidung zwischen Administrator und Mitglied ermöglicht eine partizipative Pflege der Sammlung (Hinzufügen von Filmen), schützt aber vor destruktiven Aktionen (Löschen). Die Einschränkung auf eigene Listen (Watchlist/Gesehene Filme) dient der Privatsphäre und Übersichtlichkeit innerhalb eines geteilten Systems.
+* **Gast:** Diese Rolle erfüllt die Anforderung, Dritten (z.B. Besuchern) einen Einblick in die Sammlung zu gewähren ("Was gibt es heute zu sehen?"), ohne ihnen Schreibrechte oder Zugriff auf private Nutzerdaten zu geben. Dies minimiert das Risiko von Datenmanipulation durch externe Personen.
+
+## 4. Technische Umsetzung
+
+### Inhalt der `main.sql` Datei
 
 Das Skript `main.sql` ist in drei Hauptabschnitte unterteilt, die die gesamte Struktur und Sicherheit der Datenbank definieren:
 
@@ -87,7 +137,7 @@ Das Skript `main.sql` ist in drei Hauptabschnitte unterteilt, die die gesamte St
 
 ---
 
-## 4. SQL-Abfragen
+## 5. SQL-Abfragen
 
 **Frage 1:**
 "Welche Filme (Titel und Erscheinungsjahr) hat der Benutzer 'max' auf seiner persönlichen Watchlist?"
