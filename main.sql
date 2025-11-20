@@ -131,21 +131,12 @@ INSERT INTO Benutzer (benutzerName, rollenID)
 VALUES ('sophie', 3); -- Gast
 
 -- --- MariaDB Systembenutzer erstellen ---
-CREATE USER IF NOT EXISTS 'julian'@'localhost' IDENTIFIED BY 'password';
-CREATE USER IF NOT EXISTS 'lucius'@'localhost' IDENTIFIED BY 'password';
-CREATE USER IF NOT EXISTS 'atussa'@'localhost' IDENTIFIED BY 'password';
-CREATE USER IF NOT EXISTS 'max'@'localhost' IDENTIFIED BY 'password';
-CREATE USER IF NOT EXISTS 'lena'@'localhost' IDENTIFIED BY 'password';
-CREATE USER IF NOT EXISTS 'sophie'@'localhost' IDENTIFIED BY 'password';
-
--- Passwörter der MariaDB Systembenutzer setzen (falls User schon existierte)
-ALTER USER 'julian'@'localhost' IDENTIFIED BY 'password';
-ALTER USER 'lucius'@'localhost' IDENTIFIED BY 'password';
-ALTER USER 'atussa'@'localhost' IDENTIFIED BY 'password';
-ALTER USER 'max'@'localhost' IDENTIFIED BY 'password';
-ALTER USER 'lena'@'localhost' IDENTIFIED BY 'password';
-ALTER USER 'sophie'@'localhost' IDENTIFIED BY 'password';
-
+CREATE USER IF NOT EXISTS 'julian'@'localhost';
+CREATE USER IF NOT EXISTS 'lucius'@'localhost';
+CREATE USER IF NOT EXISTS 'atussa'@'localhost';
+CREATE USER IF NOT EXISTS 'max'@'localhost';
+CREATE USER IF NOT EXISTS 'lena'@'localhost';
+CREATE USER IF NOT EXISTS 'sophie'@'localhost';
 
 -- --- VIEW: "MeineWatchlist" als persönlicher Filter für die Watchlist Tabelle ---
 

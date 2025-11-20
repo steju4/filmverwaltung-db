@@ -94,21 +94,39 @@ Diese Entscheidungen betreffen direkt den Aufbau der Tabellen und Beziehungen, w
 
 Diese Entscheidungen betreffen die Art und Weise, wie das Datenmodell mittels SQL technisch abgesichert und genutzt wird.
 
-* **Sicherheitskonzept durch personalisierte VIEWs:**
-    Mitglieder greifen niemals direkt auf die Tabellen `Watchlist` oder `GeseheneFilme` zu, sondern ausschließlich über die VIEWs `MeineWatchlist` und `MeineGesehenenFilme`.
-    * *Grund:* Dies implementiert eine "Row-Level Security". Durch den Filter `WHERE benutzerID = ... USER()` und die `WITH CHECK OPTION` wird technisch erzwungen, dass Benutzer nur ihre eigenen Datensätze sehen und bearbeiten können. Ein Manipulieren fremder Daten ist auf Datenbankebene unmöglich.
+* **Implementierung von Sicherheit durch VIEWs:**
+    Standardmäßig bietet MariaDB keine native Beschränkung auf Zeilenebene für denselben Benutzerkreis. Um dennoch sicherzustellen, dass Mitglieder nur ihre *eigenen* Listen bearbeiten können, wurden die VIEWs `MeineWatchlist` und `MeineGesehenenFilme` implementiert.
+    * *Grund:* Der direkte Zugriff auf die Basistabellen `Watchlist` und `GeseheneFilme` wird Mitgliedern entzogen. Der Zugriff erfolgt ausschließlich über die VIEWs, welche die Daten dynamisch filtern.
 
-* **Logische Kopplung von System- und Anwendungsbenutzern:**
-    Das System nutzt eine "doppelte Buchführung" für Benutzer: Der technische Zugang erfolgt über MariaDB-User (für Passwort & Rechte), die fachliche Logik über die Tabelle `Benutzer`.
-    * *Grund:* Diese Trennung entkoppelt die Sicherheit (DBMS) von den Daten (Anwendung). Die dynamische Verknüpfung über den Benutzernamen im VIEW erlaubt es uns, die Vorteile beider Welten zu nutzen: Die strikte Rechteverwaltung von SQL und die relationale Datenhaltung für Nutzerprofile.
+* **Verwendung von `USER()` im VIEW-Filter:**
+    Die Filterung erfolgt über die Bedingung `WHERE benutzerID = ... SUBSTRING_INDEX(USER()...)`.
+    * *Grund:* Die Funktion `USER()` gibt den Benutzer zurück, der die Verbindung aufgebaut hat (den "Invoker"). Dies ist notwendig, damit der VIEW dynamisch auf den jeweils eingeloggten Benutzer reagiert.
+
+* **Datenintegrität durch `WITH CHECK OPTION`:**
+    Die VIEWs wurden mit der Klausel `WITH CHECK OPTION` definiert.
+    * *Grund:* Dies verhindert, dass ein Benutzer Datensätze über den VIEW einfügt oder manipuliert, die nicht der Filterbedingung entsprechen. Konkret wird so technisch erzwungen, dass ein Benutzer (`benutzerID 4`) keinen Eintrag für einen anderen Benutzer (`benutzerID 1`) anlegen kann, da dies vom DBMS sofort blockiert wird.
+
+* **Entkopplung von Authentifizierung und Datenhaltung:**
+    Das System nutzt eine "doppelte Buchführung": Der technische Zugang erfolgt über MariaDB-User (Sicherheit), die fachliche Logik über die Tabelle `Benutzer` (Daten).
+    * *Grund:* Diese Trennung erlaubt es, die strikte Rechteverwaltung des DBMS zu nutzen, ohne die fachlichen Daten mit Systeminterna zu vermischen. Die dynamische Verknüpfung erfolgt über den übereinstimmenden Benutzernamen.
 
 #### 3. Begründung des Rollenkonzepts
 
-Das Berechtigungskonzept wurde entwickelt, um die Datenintegrität zu schützen und gleichzeitig eine flexible Nutzung im privaten Umfeld zu ermöglichen.
+Das Berechtigungskonzept folgt dem Prinzip der geringsten Privilegien ("Principle of Least Privilege"), um die Datensicherheit zu maximieren.
 
-* **Administrator:** Diese Rolle ist notwendig, um die Stammdatenpflege (Löschen, Strukturänderungen) auf eine vertrauenswürdige Person zu beschränken. Dies verhindert, dass wichtige Daten versehentlich durch andere Haushaltsmitglieder gelöscht werden.
-* **Mitglied:** Die Unterscheidung zwischen Administrator und Mitglied ermöglicht eine partizipative Pflege der Sammlung (Hinzufügen von Filmen), schützt aber vor destruktiven Aktionen (Löschen). Die Einschränkung auf eigene Listen (Watchlist/Gesehene Filme) dient der Privatsphäre und Übersichtlichkeit innerhalb eines geteilten Systems.
-* **Gast:** Diese Rolle erfüllt die Anforderung, Dritten (z.B. Besuchern) einen Einblick in die Sammlung zu gewähren ("Was gibt es heute zu sehen?"), ohne ihnen Schreibrechte oder Zugriff auf private Nutzerdaten zu geben. Dies minimiert das Risiko von Datenmanipulation durch externe Personen.
+* **Administrator:**
+    * *Funktion:* Besitzt uneingeschränkten Vollzugriff.
+    * *Grund:* Eine zentrale Instanz ist notwendig, um Stammdatenpflege (z.B. das endgültige Löschen von Filmen oder Personen) durchzuführen. Das Recht zum Löschen (`DELETE`) auf Stammdaten ist exklusiv dieser Rolle vorbehalten, um versehentlichen Datenverlust durch normale Nutzer zu verhindern.
+
+* **Mitglied:**
+    * *Funktion:* Darf die Sammlung erweitern und pflegen, sowie eigene Listen verwalten.
+    * *Grund:* Um eine kollaborative Pflege der Sammlung im Haushalt zu ermöglichen, benötigen Mitglieder Schreibrechte (`INSERT`, `UPDATE`) auf Katalogdaten. Das explizite Fehlen des `DELETE`-Rechts auf Stammdaten dient dem Schutz der gemeinsamen Sammlung. Der Zugriff auf `Watchlist` und `GeseheneFilme` ist auf die eigene `benutzerID` beschränkt, um die Privatsphäre zu wahren.
+
+* **Gast:**
+    * *Funktion:* Reiner Lesezugriff ("Read-Only").
+    * *Grund:* Diese Rolle ermöglicht Dritten (z.B. Besuchern) einen Einblick in die Sammlung, ohne ein Risiko für die Datenintegrität darzustellen. Gäste können keine Daten manipulieren und haben keinen Zugriff auf personalisierte Nutzerdaten.
+
+---
 
 ## 4. Technische Umsetzung
 
@@ -123,13 +141,13 @@ Das Skript `main.sql` ist in drei Hauptabschnitte unterteilt, die die gesamte St
 2.  **Abschnitt 2: Kernsystem und Berechtigungen**
     * Befüllt die Anwendungstabellen `Rollen` und `Benutzer` mit den Stammdaten für die Logik.
     * Erstellt die MariaDB-Systemrollen (`rolle_admin`, `rolle_mitglied`, `rolle_gast`).
-    * Erstellt die MariaDB-Systembenutzer (z.B. 'julian', 'max', 'sophie') mit Passwörtern.
+    * Erstellt die MariaDB-Systembenutzer (z.B. 'julian', 'max', 'sophie') ohne Passwörter.
     * Erstellt die beiden Sicherheits-`VIEW`s (`MeineWatchlist`, `MeineGesehenenFilme`), die als "Brücke" zwischen den Systembenutzern und der Anwendungslogik dienen.
     * Vergibt detaillierte `GRANT`-Berechtigungen an die Rollen.
     * Weist den Benutzern ihre jeweiligen Rollen zu und setzt diese als `DEFAULT ROLE`, damit sie beim Login automatisch aktiv sind.
 
 3.  **Abschnitt 3: Datenbefüllung**
-    * Befüllt die Tabellen `Genres` und `Filmreihen` mit den grundlegenden Kategorien
+    * Befüllt die Tabellen `Genres` und `Filmreihen` mit den grundlegenden Kategorien.
     * Fügt Beispieldaten für `Personen` (Regisseure und Schauspieler) hinzu, die in den Filmen vorkommen.
     * Befüllt die Tabelle `Filme` mit einer umfangreichen Sammlung von Beispielfilmen, inklusive Metadaten.
     * Verknüpft Filme mit Personen über die Tabelle `Film_Beteiligungen` und legt dabei fest, ob die Person als Regisseur und/oder Schauspieler beteiligt war.
@@ -164,6 +182,8 @@ WHERE
 ORDER BY
     F.titel;
 ```
+Diese Abfrage dient dazu, die Inhalte der Watchlist für einen Benutzer auszugeben. Da die Tabelle `Watchlist` lediglich die IDs der Filme und Benutzer speichert, ist eine Verknüpfung (`JOIN`) mit den Stammdaten-Tabellen `Filme` und `Benutzer` notwendig. Nur so können Titel und Erscheinungsjahr angezeigt werden. Der abschließende `WHERE`-Filter auf den Benutzernamen 'max' schränkt die Ergebnismenge gezielt ein, sodass nur persönliche Einträge geliefert werden.
+
 
 **Frage 2:**
 "Welche 5 Personen sind in der gesamten Sammlung am häufigsten als Schauspieler vertreten? Zeige den Namen der Person und die Anzahl der Filme, in denen sie mitspielt."
@@ -191,6 +211,7 @@ ORDER BY
     anzahlFilme DESC -- Sortiere von der höchsten zur niedrigsten Anzahl
 LIMIT 5; -- Zeige nur die Top 5 an
 ```
+Ziel dieser Abfrage ist eine Auswertung der Sammlung, um die am häufigsten vertretenen Schauspieler herauszufinden. Die Basis bildet die Tabelle `Film_Beteiligungen`, wobei hier der Filter `istSchauspieler = TRUE` wichtig ist, um Regisseure auszuschließen. Mithilfe der Gruppierung (`GROUP BY`) werden alle Filmeinträge einer Person zusammengefasst, während `COUNT` die Anzahl dieser Einträge berechnet. Durch die Sortierung nach Häufigkeit (`DESC`) und die Begrenzung auf fünf Datensätze (`LIMIT 5`) entsteht die Top-5-Rangliste.
 
 **Frage 3:**
 "Liste für jeden Benutzer (ausgenommen 'Gast') seine Top 3 am besten bewerteten Filme auf. Die Abfrage soll den Benutzernamen, den Filmtitel und die persönliche Bewertung anzeigen."
@@ -238,3 +259,5 @@ WHERE
 ORDER BY
     benutzerName, rang;
 ```
+Diese Abfrage dient dazu, für jeden Benutzer separat eine Top-3-Liste mit Detailinfos zu erstellen. Da herkömmliche Gruppierungen hier nicht mehr ausreichen, wird eine **Common Table Expression (CTE)** zur Vorberechnung genutzt.
+Fensterfunktion `ROW_NUMBER()`: Durch die Anweisung `PARTITION BY` wird die Nummerierung für jeden Benutzer neu gestartet, während `ORDER BY` die Filme innerhalb dieser Benutzer-Partition nach ihrer Bewertung sortiert. So erhält jeder Film einen eindeutigen Rang (1, 2, 3...). Die eigentliche Hauptabfrage muss dann nur noch auf diese vorberechneten Ränge zugreifen und mittels `WHERE rang <= 3` die besten drei Filme pro Person herausfiltern.

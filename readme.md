@@ -36,7 +36,7 @@ Nachdem die Skripte ausgeführt wurde, kann die Datenbank getestet werden, indem
 
 ### Testbenutzer & Rollen
 
-Alle Benutzer haben das Passwort **`'password'`**.
+Alle Benutzer haben kein Passwort gesetzt.
 
 | Benutzername | Anwendungs-Rolle | MariaDB-Rolle | Zweck |
 | :--- | :--- | :--- | :--- |
