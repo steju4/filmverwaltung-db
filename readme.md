@@ -2,6 +2,10 @@
 
 Dieses Repository enthält das `main.sql`-Skript für die Projektarbeit im Modul Datenbanken. Das Skript erstellt eine MariaDB-Datenbank zur Verwaltung einer privaten Filmsammlung, inklusive eines detaillierten Berechtigungskonzepts.
 
+**Autor:innen:** Atussa Mehrawari, Lucius Lechner, Julian Stengele
+
+---
+
 ## Voraussetzungen
 
 * Eine laufende MariaDB-Datenbankinstanz (Version 10.6 oder neuer wird für volle Kompatibilität dringend empfohlen).

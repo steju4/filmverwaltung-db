@@ -1,5 +1,9 @@
 # Projektarbeit: Datenbank zur Filmverwaltung
 
+**Autor:innen:** Atussa Mehrawari, Lucius Lechner, Julian Stengele
+
+---
+
 ## 1. Fachlicher Anwendungsbezug
 
 ### Grundidee und Szenario
