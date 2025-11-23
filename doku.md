@@ -72,10 +72,10 @@ Diese Entscheidungen betreffen direkt den Aufbau der Tabellen und Beziehungen, w
 
 * **Generalisierung der Entität "Personen":**
     Schauspieler und Regisseure werden nicht als getrennte Entitäten modelliert, sondern in einer generalisierten Entität `Personen` zusammengefasst.
-    * *Grund:* In der Filmindustrie übernehmen Personen oft beide Rollen (z. B. Clint Eastwood). Getrennte Entitäten würden zu Redundanzen führen. Eine zentrale Tabelle vereinfacht die Pflege der Stammdaten massiv.
+    * *Grund:* Bei einigen Filmen übernehmen Personen oft beide Rollen (z. B. Clint Eastwood). Getrennte Entitäten würden zu Redundanzen führen. Eine zentrale Tabelle vereinfacht die Pflege der Stammdaten massiv.
 
 * **Modellierung der Film-Beteiligungen (n:m mit Attributen):**
-    Die Beziehung zwischen `Filme` und `Personen` ist als eine einzige n:m-Beziehung modelliert. Anstatt zwei separate Beziehungen (`führt_regie`, `spielt_mit`) zu zeichnen, nutzen wir Attribute (`istRegisseur`, `istSchauspieler`) direkt an der Beziehungsraute.
+    Die Beziehung zwischen `Filme` und `Personen` ist als eine einzige n:m-Beziehung modelliert. Anstatt zwei separate Beziehungen (`führt_regie`, `spielt_mit`) zu nutzen, nutzen wir Attribute (`istRegisseur`, `istSchauspieler`) direkt an der Beziehungsraute.
     * *Grund:* Dies reduziert die Komplexität des Diagramms. Eine Person kann in einem einzigen Datensatz präzise einem Film zugeordnet werden, auch wenn sie mehrere Funktionen gleichzeitig ausübt.
 
 * **Personalisierte Listen als Beziehungstabellen:**
@@ -88,7 +88,7 @@ Diese Entscheidungen betreffen direkt den Aufbau der Tabellen und Beziehungen, w
 
 * **Auslagerung der Rollen in eine eigene Entität:**
   Die Benutzerrollen (`Administrator`, `Mitglied`, `Gast`) werden nicht als einfaches Textfeld in der Tabelle `Benutzer` gespeichert, sondern in einer eigenständigen Tabelle `Rollen` verwaltet und über einen Fremdschlüssel referenziert.
-  * *Grund:* Dies gewährleistet die Datenintegrität und Normalisierung. Es verhindert inkonsistente Schreibweisen (z.B. "Admin" vs. "Administrator") und stellt sicher, dass Benutzern nur gültige, vordefinierte Rollenbezeichnungen zugewiesen werden können.
+  * *Grund:* Dies gewährleistet die Datenintegrität und Normalisierung. Es stellt sicher, dass Benutzern nur gültige, vordefinierte Rollenbezeichnungen zugewiesen werden können.
 
 * **Normalisierung (Genres und Filmreihen):**
     Attribute wie `Genre` und `Filmreihe` wurden in eigenständige Entitäten ausgelagert (3. Normalform).
@@ -99,16 +99,16 @@ Diese Entscheidungen betreffen direkt den Aufbau der Tabellen und Beziehungen, w
 Diese Entscheidungen betreffen die Art und Weise, wie das Datenmodell mittels SQL technisch abgesichert und genutzt wird.
 
 * **Implementierung von Sicherheit durch VIEWs:**
-    Standardmäßig bietet MariaDB keine native Beschränkung auf Zeilenebene für denselben Benutzerkreis. Um dennoch sicherzustellen, dass Mitglieder nur ihre *eigenen* Listen bearbeiten können, wurden die VIEWs `MeineWatchlist` und `MeineGesehenenFilme` implementiert.
+    Standardmäßig bietet MariaDB keine native Beschränkung auf Zeilenebene für denselben Benutzerkreis. Um dennoch sicherzustellen, dass Mitglieder nur ihre *eigenen* Listen bearbeiten und einsehen können, wurden die VIEWs `MeineWatchlist` und `MeineGesehenenFilme` implementiert.
     * *Grund:* Der direkte Zugriff auf die Basistabellen `Watchlist` und `GeseheneFilme` wird Mitgliedern entzogen. Der Zugriff erfolgt ausschließlich über die VIEWs, welche die Daten dynamisch filtern.
 
 * **Verwendung von `USER()` im VIEW-Filter:**
     Die Filterung erfolgt über die Bedingung `WHERE benutzerID = ... SUBSTRING_INDEX(USER()...)`.
-    * *Grund:* Die Funktion `USER()` gibt den Benutzer zurück, der die Verbindung aufgebaut hat (den "Invoker"). Dies ist notwendig, damit der VIEW dynamisch auf den jeweils eingeloggten Benutzer reagiert.
+    * *Grund:* Die Funktion `USER()` gibt den Benutzer zurück, der die Verbindung aufgebaut hat. Dies ist notwendig, damit der VIEW dynamisch auf den jeweils eingeloggten Benutzer reagiert.
 
 * **Datenintegrität durch `WITH CHECK OPTION`:**
     Die VIEWs wurden mit der Klausel `WITH CHECK OPTION` definiert.
-    * *Grund:* Dies verhindert, dass ein Benutzer Datensätze über den VIEW einfügt oder manipuliert, die nicht der Filterbedingung entsprechen. Konkret wird so technisch erzwungen, dass ein Benutzer (`benutzerID 4`) keinen Eintrag für einen anderen Benutzer (`benutzerID 1`) anlegen kann, da dies vom DBMS sofort blockiert wird.
+    * *Grund:* Dies verhindert, dass ein Benutzer Datensätze über den VIEW einfügt oder manipuliert, die nicht der Filterbedingung entsprechen. Es wird so technisch erzwungen, dass ein Benutzer (`benutzerID 4`) keinen Eintrag für einen anderen Benutzer (`benutzerID 1`) anlegen kann, da dies vom DBMS sofort blockiert wird.
 
 * **Entkopplung von Authentifizierung und Datenhaltung:**
     Das System nutzt eine "doppelte Buchführung": Der technische Zugang erfolgt über MariaDB-User (Sicherheit), die fachliche Logik über die Tabelle `Benutzer` (Daten).
@@ -223,6 +223,7 @@ Ziel dieser Abfrage ist eine Auswertung der Sammlung, um die am häufigsten vert
 ```sql
 -- Frage 3:
 -- Abfrage nutzt CTE (WITH...) und Window Function (ROW_NUMBER()).
+-- Diese Abfrage kann nur als Benutzer mit Admin-Rechten ausgeführt werden!
 
 -- 1. CTE definieren 'RankedFilme'
 WITH RankedFilme AS (
