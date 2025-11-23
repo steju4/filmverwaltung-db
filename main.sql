@@ -414,7 +414,6 @@ INSERT INTO GeseheneFilme (benutzerID, filmID, gesehenAm, persoenlicheBewertung)
 (3, 12, '2025-04-12', 8), -- Atussa hat 'Gran Torino' (Film 12) gesehen & bewertet
 (3, 24, '2025-02-18', 9),  -- Atussa hat 'Parasite' (Film 24) gesehen & bewertet
 (3, 34, '2025-03-12', 10), -- Atussa hat 'Whiplash' (Film 34) gesehen & bewertet
-(3, 22, '2025-04-01', 8),  -- Atussa hat 'Forrest Gump' (Film 22) gesehen & bewertet
 (4, 10, '2025-05-05', 10), -- Max hat 'Fight Club' (Film 10) gesehen & bewertet
 (4, 7, '2025-06-15', 8),  -- Max hat 'Pulp Fiction' (Film 7) gesehen & bewertet
 (4, 20, '2025-07-20', 9),  -- Max hat 'Oppenheimer' (Film 20) gesehen & bewertet
