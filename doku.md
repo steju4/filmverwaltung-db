@@ -94,9 +94,18 @@ Diese Entscheidungen betreffen direkt den Aufbau der Tabellen und Beziehungen, w
     Attribute wie `Genre` und `Filmreihe` wurden in eigenständige Entitäten ausgelagert (3. Normalform).
     * *Grund:* Vermeidung von Redundanz und Inkonsistenz (z. B. Schreibfehler). Änderungen an einer Bezeichnung wirken sich so sofort global auf alle verknüpften Filme aus.
 
+* **Speicherung des Mediums als Attribut (Denormalisierung):**
+    Das Medium eines Films (z. B. 'DVD', 'Blu-ray', 'Streaming') wird als einfaches `VARCHAR`-Attribut direkt in der Tabelle `Filme` gespeichert und nicht in eine eigene Tabelle ausgelagert.
+    * *Grund:* Dies ist eine bewusste Entscheidung gegen eine vollständige Normalisierung, um die Komplexität geringer zu halten. Da die Anzahl möglicher Medienformate überschaubar ist und sich selten ändert, würde eine separate Tabelle unnötige `JOIN`-Operationen erfordern, ohne einen größeren Mehrwert für die Datenintegrität in diesem Szenario zu bieten.
+
+
 #### 2. Begründungen zur technischen Umsetzung (Logik & Sicherheit)
 
 Diese Entscheidungen betreffen die Art und Weise, wie das Datenmodell mittels SQL technisch abgesichert und genutzt wird.
+
+* **Zwingende Namensgleichheit von System- und Anwendungsbenutzer:**
+    Das System setzt voraus, dass beim Anlegen eines neuen Nutzers zwei Schritte erfolgen: 1. Erstellung des MariaDB-Systemusers (`CREATE USER 'max'...`) und 2. Eintrag in die Tabelle `Benutzer` mit exakt demselben Namen (`INSERT INTO Benutzer (benutzerName) VALUES ('max')`).
+    * *Grund:* Die gesamte Logik der personalisierten `VIEW`s basiert auf der SQL-Funktion `USER()`. Das System vergleicht den eingeloggten System-User mit der Spalte `benutzerName`. Stimmen diese Namen nicht überein, kann die Datenbank den Nutzer nicht zuordnen, und die personalisierten Listen (Watchlist, Gesehene Filme) bleiben leer oder unzugänglich.
 
 * **Implementierung von Sicherheit durch VIEWs:**
     Standardmäßig bietet MariaDB keine native Beschränkung auf Zeilenebene für denselben Benutzerkreis. Um dennoch sicherzustellen, dass Mitglieder nur ihre *eigenen* Listen bearbeiten und einsehen können, wurden die VIEWs `MeineWatchlist` und `MeineGesehenenFilme` implementiert.
@@ -113,6 +122,19 @@ Diese Entscheidungen betreffen die Art und Weise, wie das Datenmodell mittels SQ
 * **Entkopplung von Authentifizierung und Datenhaltung:**
     Das System nutzt eine "doppelte Buchführung": Der technische Zugang erfolgt über MariaDB-User (Sicherheit), die fachliche Logik über die Tabelle `Benutzer` (Daten).
     * *Grund:* Diese Trennung erlaubt es, die strikte Rechteverwaltung des DBMS zu nutzen, ohne die fachlichen Daten mit Systeminterna zu vermischen. Die dynamische Verknüpfung erfolgt über den übereinstimmenden Benutzernamen.
+
+* **Restriktive Löschung:**
+    Bei den Fremdschlüsselbeziehungen wurde bewusst auf die Option `ON DELETE CASCADE` verzichtet (Standardverhalten ist `RESTRICT`).
+    * *Grund:* Dies dient dem Schutz vor versehentlichem Datenverlust. Ein Administrator kann einen Film nicht löschen, solange dieser noch auf der Watchlist oder der "Gesehen"-Liste eines Nutzers steht. Die Datenbank erzwingt so, dass Abhängigkeiten erst bereinigt werden müssen, bevor Stammdaten entfernt werden.
+
+* **Automatische Rollenaktivierung (`SET DEFAULT ROLE`):**
+    Am Ende des Skripts wird für jeden Benutzer explizit `SET DEFAULT ROLE ...` ausgeführt.
+    * *Grund:* In MariaDB sind zugewiesene Rollen nach dem Login standardmäßig nicht aktiv. Der Benutzer müsste sie sonst bei jeder Sitzung manuell mit dem Befehl `SET ROLE` aktivieren. Durch die Definition als Default-Rolle geschieht dies automatisch beim Login, was die Usability für die Endanwender erhöht.
+    
+* **Durchsetzung von Geschäftsregeln durch `CHECK`-Constraints:**
+    Logische Regeln werden direkt auf Datenbankebene erzwungen.
+    * *1. (`chk_bewertung`):* Es wird technisch sichergestellt, dass Bewertungen nur im Intervall 1–10 liegen können.
+    * *2. (`chk_mindestens_eine_rolle`):* In der Tabelle `Film_Beteiligungen` wird verhindert, dass eine Verknüpfung entsteht, bei der eine Person weder Regisseur noch Schauspieler ist. Dies vermeidet sinnlose "Leichen" in der Datenbank.
 
 #### 3. Begründung des Rollenkonzepts
 
